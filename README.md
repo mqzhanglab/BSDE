@@ -2,7 +2,7 @@
 A single-cell RNAseq differential expression analysis approach in case-control study.
 
 
-![alt text](https://github.com/mqzhanglab/BSDE/blob/main/image.jpg?raw=true)
+![alt text](https://github.com/mqzhanglab/BSDE/blob/main/data/Fig1.png?raw=true)
 
 
 See [here](https://github.com/mqzhanglab/BSDE/blob/main/simulation/simulation.html) to find examples based on the simulated data.

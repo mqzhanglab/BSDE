@@ -25,32 +25,16 @@ Here we present a demo version of our simulation here, which are minimized and b
 
 In this simulation example, we will generate 30 genes from a particular type of cell of 20 case subjects and 20 control subjects, with each subjects have 100 cells. We simulate the basic parameters, i.e., the mean, dispersion and dropout parameter from the distribution of the real reference scRNAseq database from paper [Single-cell genomics identifies cell type–specific molecular changes in autism](https://science.sciencemag.org/content/364/6441/685.abstract).
 
-\item Mean DE: The size factor is varied from $r_{\mu}=1.1,1.2,1.5,2,4$. Parameters $(\mu_{\ast},\varphi_{\ast},z_{\ast})$ are specified relative to $(\mu,\varphi,z)$ as
-\[\mu_{\ast}=\frac{\mu}{r_\mu}, \quad \varphi_{\ast} = \frac{\varphi \mu}{\mu + (1-r_{\mu})\varphi}, \quad z_{\ast}=z\]
-such that the variances are the same.
-
-\item Variance DE: The size factor is varied from $r_v=1.1,1.2,1.5,2,4$. Parameters $(\mu_{\ast},\varphi_{\ast},z_{\ast})$ are specified relative to $(\mu,\varphi,z)$ as
-\[ \mu_{\ast} = \mu, \quad \varphi_{\ast} = \frac{\varphi \mu}{r_v \mu + (r_v - 1) \varphi + (r_v - 1)z \varphi \mu} \]
-and $z_{\ast} = z$ such that the mean remains the same.
-
-\item Multimodality DE: The size factor is varied from $r_m=0.1,0.2,0.3,0.4$. Counts are simulated from either a two-component mixture $\nicefrac{1}{2} \,\mathrm{ZINB}(\mu_1,\varphi,z) + \nicefrac{1}{2} \, \mathrm{ZINB}(\mu_2,\varphi,z)$, or its single-component counterpart $\mathrm{ZINB}(\mu_{\ast},\varphi_{\ast},z_{\ast})$. The parameters are related by
-\[ \mu_1 = \frac{\mu_2(1+r_m)}{1-r_m} \]
-and 
-\[ \mu_{\ast} = \frac{\mu_2}{1-r_m}, \quad \varphi_{\ast} = \frac{\varphi}{1 + r_m^2 + r_m^2 \varphi^2}, \quad z_{\ast} = z \]
-such that the mean and the variance are unchanged.
-
-\item Proportion DE: The size factor is varied from $r_p = 0.1, 0.2, 0.3, 0.4$. Counts are simulated from either mixture $r_p \,\mathrm{ZINB}(\mu_1,\varphi,z) + (1-r_p) \,\mathrm{ZINB}(\mu_2,\varphi,z)$ or the component-swapped $(1-r_p) \,\mathrm{ZINB}(\mu_1,\varphi,z) + r_p \,\mathrm{ZINB}(\mu_2,\varphi,z)$.
-\end{enumerate}
 
 Within this 30 genes, we simulate 4 different type of DEs by adding on particular ratios to the basic parameters to get expected fold changes.
 
-(1). mean DE: 10% genes are DE in mean but not in var, the genes are differential expressed in mean between cases and controls. In practice, we simulate 150 genes up-regulated in cases, and another 150 genes up-regulated in control to keep the total library size same.We implement this setting by simply change the parameter /mu and /dispersion to suit the expected fold changes in mean with the function calc_zinb_param.
+(1). mean DE: 10% genes are DE in mean but not in var, the genes are differential expressed in mean between cases and controls. We implement this setting by simply change the parameter /mu and /dispersion to suit the expected fold changes in mean with the function calc_zinb_param.
 
 (2).var DE: 10% genes are DE in var but not mean, the genes are differential expressed in mean between cases and controls. In practice, we simulate 150 genes changes in cases, and another 150 genes changes in control. We implement this setting by simply change the parameter /mu and /dispersion to suit the expected fold changes in mean with the function calc_zinb_param.
 
-(3).multimodality DE: 10% genes are DE due to Multimodality. Suppose Z have equaliy probability to falls into two NB/ZINB distribution Z1~ZINB(mu1,size1,drop1), Z2~ZINB(mu2,size2,drop2). Suppose another variable Z3~ZINB(mu3,size3,drop3), who has the same mean and variance as Z1. Then it is not too difficult to calculate the mu3,size3,drop3 with known m1, size1, drop1 and m2, size2, drop2. In practice, we simulate 150 genes are mixtured with 2 ZINB distributions in cases, and another 150 genes are mixtured with 2 ZINB distributions in control.We implement this setting by supporting the m1=m3+t, m2=m3-t, while the t equals to given proportion of m3(eg: t=0.2*m3). To avoid generating negative parameters. We will set the basic parameters as the parameters as the distribution of Z2, and then generate Z1 and Z3 according to t.
+(3).multimodality DE: 10% genes are DE due to Multimodality. Suppose Z have equaliy probability to falls into two NB/ZINB distribution Z1 from ZINB(mu1,size1,drop1), Z2 from ZINB(mu2,size2,drop2). Suppose another variable Z3 from ZINB(mu3,size3,drop3), who has the same mean and variance as Z1. Then it is not too difficult to calculate the mu3,size3,drop3 with known m1, size1, drop1 and m2, size2, drop2. We implement this setting by supporting the m1=m3+t, m2=m3-t, while the t equals to given proportion of m3(eg: t=0.2*m3). To avoid generating negative parameters. We will set the basic parameters as the parameters as the distribution of Z2, and then generate Z1 and Z3 according to t.
 
-(4).disp DE: 10% genes are DE in dispersion.As the one of the parameter to describe ZINB model, dispersion majorly describes the shape of ZINB distribution. According to bulk gene analysis [DESeq2](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html), the dispersion is related to mean when the expression level is not very high. In practice, we simulate 150 genes up-regulated in cases, 150 genes up-regulated in control. We implement this setting by simply change the /mu, which is the mean parameter of ZINB.
+(4).disp DE: 10% genes are DE in dispersion.As the one of the parameter to describe ZINB model, dispersion majorly describes the shape of ZINB distribution. According to bulk gene analysis [DESeq2](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html), the dispersion is related to mean when the expression level is not very high. The size factor is varied from r_p = 0.6, 0.7, 0.8, 0.9.
 
 ## Basic Settings
 

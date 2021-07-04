@@ -1,5 +1,5 @@
 # BSDE
-A single-cell RNAseq differential expression analysis approach in case-control study.
+## A single-cell RNAseq differential expression analysis approach in case-control study.
 
 
 ![alt text](https://github.com/mqzhanglab/BSDE/blob/main/data/Fig1.png?raw=true)

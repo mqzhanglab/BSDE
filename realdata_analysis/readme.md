@@ -278,7 +278,7 @@ p2=ggplot(this_table, aes(x=cluster, y=pval_num,fill=1)) +
 print(p2)
 ```
 
-##Gene set enrichment analysis
+## Gene set enrichment analysis
 
 We also perform gene set enrichment analysis using the [GOSeq package](https://bioconductor.org/packages/release/bioc/html/goseq.html).For manually annotation, we download gencode.v37.annotation.gtf from [here](ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_37/gencode.v37.annotation.gtf.gz).
 

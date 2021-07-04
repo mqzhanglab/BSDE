@@ -45,21 +45,23 @@ library("abind")
 source("~/Dropbox/Barycenter/BSDEpackage/BSDE/R/simu_functions.R")
 ```
 
+
 # Simulation
 
 Here we present a demo version of our simulation here, which are minimized and based on the DCA output of the 10% autism dataset with top 100 expressed genes.
 
 In this simulation example, we will generate 30 genes from a particular type of cell of 20 case subjects and 20 control subjects, with each subjects have 100 cells. We simulate the basic parameters, i.e., the mean, dispersion and dropout parameter from the distribution of the real reference scRNAseq database from paper [Single-cell genomics identifies cell type–specific molecular changes in autism](https://science.sciencemag.org/content/364/6441/685.abstract).
 
+
 Within this 30 genes, we simulate 4 different type of DEs by adding on particular ratios to the basic parameters to get expected fold changes.
 
-(1). mean DE: 10% genes are DE in mean but not in var, the genes are differential expressed in mean between cases and controls. In practice, we simulate 150 genes up-regulated in cases, and another 150 genes up-regulated in control to keep the total library size same.We implement this setting by simply change the parameter /mu and /dispersion to suit the expected fold changes in mean with the function calc_zinb_param.
+(1). mean DE: 10% genes are DE in mean but not in var, the genes are differential expressed in mean between cases and controls. We implement this setting by simply change the parameter /mu and /dispersion to suit the expected fold changes in mean with the function calc_zinb_param.
 
 (2).var DE: 10% genes are DE in var but not mean, the genes are differential expressed in mean between cases and controls. In practice, we simulate 150 genes changes in cases, and another 150 genes changes in control. We implement this setting by simply change the parameter /mu and /dispersion to suit the expected fold changes in mean with the function calc_zinb_param.
 
-(3).multimodality DE: 10% genes are DE due to Multimodality. Suppose Z have equaliy probability to falls into two NB/ZINB distribution Z1~ZINB(mu1,size1,drop1), Z2~ZINB(mu2,size2,drop2). Suppose another variable Z3~ZINB(mu3,size3,drop3), who has the same mean and variance as Z1. Then it is not too difficult to calculate the mu3,size3,drop3 with known m1, size1, drop1 and m2, size2, drop2. In practice, we simulate 150 genes are mixtured with 2 ZINB distributions in cases, and another 150 genes are mixtured with 2 ZINB distributions in control.We implement this setting by supporting the m1=m3+t, m2=m3-t, while the t equals to given proportion of m3(eg: t=0.2*m3). To avoid generating negative parameters. We will set the basic parameters as the parameters as the distribution of Z2, and then generate Z1 and Z3 according to t.
+(3).multimodality DE: 10% genes are DE due to Multimodality. Suppose Z have equaliy probability to falls into two NB/ZINB distribution Z1 from ZINB(mu1,size1,drop1), Z2 from ZINB(mu2,size2,drop2). Suppose another variable Z3 from ZINB(mu3,size3,drop3), who has the same mean and variance as Z1. Then it is not too difficult to calculate the mu3,size3,drop3 with known m1, size1, drop1 and m2, size2, drop2. We implement this setting by supporting the m1=m3+t, m2=m3-t, while the t equals to given proportion of m3(eg: t=0.2*m3). To avoid generating negative parameters. We will set the basic parameters as the parameters as the distribution of Z2, and then generate Z1 and Z3 according to t.
 
-(4).disp DE: 10% genes are DE in dispersion.As the one of the parameter to describe ZINB model, dispersion majorly describes the shape of ZINB distribution. According to bulk gene analysis [DESeq2](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html), the dispersion is related to mean when the expression level is not very high. In practice, we simulate 150 genes up-regulated in cases, 150 genes up-regulated in control. We implement this setting by simply change the /mu, which is the mean parameter of ZINB.
+(4).disp DE: 10% genes are DE in dispersion.As the one of the parameter to describe ZINB model, dispersion majorly describes the shape of ZINB distribution. According to bulk gene analysis [DESeq2](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html), the dispersion is related to mean when the expression level is not very high. The size factor is varied from r_p = 0.6, 0.7, 0.8, 0.9.
 
 ## Basic Settings
 
@@ -416,6 +418,8 @@ cell_readdepth = apply(sim_matrix, 2, sum)
 cell_count_quantile = apply(sim_matrix, 2, quantile)
 
 ```
+
+
 
 # Simulated Differential Expressed Analysis
 We calculate the p-values of the simulated genes through the BSDE method as well as the [MAST](https://www.bioconductor.org/packages/release/bioc/html/MAST.html) (with a widely used protocol mixed-effect model "glmer" & Likelihood-ratio Test) and the [DESeq2](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html).

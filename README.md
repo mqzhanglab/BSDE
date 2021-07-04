@@ -7,7 +7,7 @@
 
 
 
-## package installation
+## Package Installation
 ```{r install}
 install.packages("devtools")
 library(devtools)

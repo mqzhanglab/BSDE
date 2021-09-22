@@ -1,30 +1,24 @@
 ---
-title: "Simulation Procedure in BSDE Projects"
+title: "An Introduction to BSDE"
 author: "Mengqi Zhang, Richard Guo"
 date: "`r Sys.Date()`"
-output: 
+output:
   BiocStyle::html_document:
     toc: true
-  # html_document:
-  #   theme: journal
-  #   highlight: tango
-  #   toc: true
-  #   toc_depth: 3
-  #   toc_float:
-  #     collapsed: true
-  #     smooth_scroll: false
-  #   number_sections: true
-editor_options: 
-  chunk_output_type: console
+vignette: >
+  %\VignetteEncoding{UTF-8}
 ---
 
-
-
-```{r setup, include=FALSE}
-library(knitr)
-knitr::opts_chunk$set(echo=TRUE, cache = !TRUE, warning = FALSE, 
-                      message = FALSE, cache.lazy = FALSE)
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo=TRUE, cache = !TRUE, warning = FALSE, 
+  message = FALSE, cache.lazy = FALSE
+)
 runcode=!FALSE
+
+library(BSDE)
 ```
 
 # Introduction
@@ -43,7 +37,6 @@ library("MAST")
 library("lme4")
 library("DESeq2")
 library("abind")
-library("BSDE")
 ```
 
 
@@ -118,7 +111,6 @@ Note: DCA itself includes the size factor of each cells in its pipelines.Thus th
 
 ```{r load_expression_data,eval=runcode}
 file_tag = paste0(r_mean, "_", r_var, "_", r_mult, "_", r_dp)
-
 
 #readin data
 t_mean = readRDS("../data/autism/dca_PFCL23_100x10perc/mean.rds")
@@ -502,7 +494,6 @@ library("ggplot2")
 library("emdbook")
 library("Rcpp")
 library("Barycenter")
-library("BSDE")
 
 op_pval = matrix(ncol = 1, nrow = nrow(sim_matrix_log))
 
@@ -541,7 +532,7 @@ sessionInfo()
 ```
 
 # Reference
-# Reference
+
 
 Finak, G., McDavid, A., Yajima, M., Deng, J., Gersuk, V., Shalek, A. K., ... & Gottardo, R. (2015). MAST: a flexible statistical framework for assessing transcriptional changes and characterizing heterogeneity in single-cell RNA sequencing data. Genome biology, 16(1), 1-13.
 

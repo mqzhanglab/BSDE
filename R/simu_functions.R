@@ -4,15 +4,15 @@
 #' @param drop the original parameter dropout_rate of of ZINB distribution
 #' @param r_m the targeted fold change of mean
 #' @param v_m the targeted fold change of variance
-
+#'
 #' @return two number for parameter mu and theta of modified ZINB distribution
-
+#'
 #' @note For numerical meaningful calculation, is is required that r_m/r_v <1+mu/theta
-
+#'
 #' @example
 #' calc_zinb_param(2,3,r_m=1.3)
 #' calc_zinb_param(2,3,r_v=1.5)
-
+#'
 calc_zinb_param = function(mu,
                            theta,
                            drop = 0,
@@ -33,7 +33,7 @@ calc_zinb_param = function(mu,
 #' This distribution has the same dropout_rate as the mixture of two ZINB with equal 50%-50% proportions
 #' The two ZINB have the same dropout_rate, same overdispersion (size) and the same distance of expectation from the mu_3,
 #' i.e. ZINB(mu_3(1+t),size,pi_3) and ZINB(mu_3(1-t),size,pi_3)
-
+#'
 #' @param size parameter theta of the zinb model, the distribution will be more close to zero-inflated poission with larger parameter size.
 #' @param parameter t as the numeric 0<=t<=1
 #' @return size3 The parameter theta in the notation

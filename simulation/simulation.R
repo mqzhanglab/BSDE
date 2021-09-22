@@ -13,9 +13,7 @@ library("DESeq2")
 library("moments")
 library("MAST")
 library("lme4")
-
-
-source("~/Dropbox/Barycenter/BSDEpackage/BSDE/R/simu_functions.R")
+library("BSDE")
 
 #senarios
 nMean = 3 # of genes shows mean differences
@@ -53,7 +51,7 @@ i_ctrl = (ncase * ncell + 1):(nall * ncell)
 # ############ Simulation Data Preparation ###############################
 
 file_tag = paste0(r_mean, "_", r_var, "_", r_mult, "_", r_dp)
-dir = "~/Dropbox/Barycenter/BSDEpackage/BSDE/data/"
+dir = "../data/"
 setwd(dir)
 
 RIN_adj = TRUE
@@ -582,10 +580,8 @@ library("ggplot2")
 library("emdbook")
 library("Rcpp")
 library("Barycenter")
+library("BSDE")
 
-use_python("/nas/longleaf/apps/python/3.5.1/bin/python3")
-source("~/Dropbox/Barycenter/BSDEpackage/BSDE/R/op_functions.R")
-py_run_file("~/Dropbox/Barycenter/BSDEpackage/op_functions.py")
 op_pval = matrix(ncol = 1, nrow = nrow(sim_matrix_log))
 
 

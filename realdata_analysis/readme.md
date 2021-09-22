@@ -15,12 +15,7 @@ library("DESeq2")
 library("abind")
 library("doRNG")
 library("reticulate")
-#library("BSDE")
-
-source("~/Dropbox/Barycenter/BSDEpackage/BSDE/R/simu_functions.R")
-source("~/Dropbox/Barycenter/BSDEpackage/BSDE/R/op_functions.R")
-#use_python("/nas/longleaf/apps/python/3.5.1/bin/python3")
-py_run_file(paste0("~/Dropbox/Barycenter/BSDEpackage/BSDE/inst/op_functions.py"))
+library("BSDE")
 
 
 ```

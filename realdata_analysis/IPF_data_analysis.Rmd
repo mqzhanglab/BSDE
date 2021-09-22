@@ -3,15 +3,17 @@ title: "Real Data Analysis in BSDE Projects"
 author: "Mengqi Zhang, Richard Guo"
 date: "`r Sys.Date()`"
 output: 
-  html_document:
-    theme: journal
-    highlight: tango
+  BiocStyle::html_document:
     toc: true
-    toc_depth: 3
-    toc_float:
-      collapsed: true
-      smooth_scroll: false
-    number_sections: true
+  # html_document:
+  #   theme: journal
+  #   highlight: tango
+  #   toc: true
+  #   toc_depth: 3
+  #   toc_float:
+  #     collapsed: true
+  #     smooth_scroll: false
+  #   number_sections: true
 editor_options: 
   chunk_output_type: console
 ---
@@ -41,13 +43,7 @@ library("DESeq2")
 library("abind")
 library("doRNG")
 library("reticulate")
-#library("BSDE")
-
-source("~/Dropbox/Barycenter/BSDEpackage/BSDE/R/simu_functions.R")
-source("~/Dropbox/Barycenter/BSDEpackage/BSDE/R/op_functions.R")
-#use_python("/nas/longleaf/apps/python/3.5.1/bin/python3")
-py_run_file(paste0("~/Dropbox/Barycenter/BSDEpackage/BSDE/inst/op_functions.py"))
-
+library("BSDE")
 
 ```
 
@@ -69,34 +65,32 @@ perm_label=0 #perm_label =0 means calculate the observed data other wise, permut
 merge_method="python" # c("R","python","python_exp")
 lambda_fold=2
 
-
-dir = "~/Dropbox/Barycenter/BSDEpackage/BSDE/data/"
-setwd(dir)
 ```
 
 ## Data Preparation
 ```{R data_load,eval=runcode}
 ###########input###############
-meta=readRDS(paste0(dir,"IPF/meta.rds"))
+
+meta=readRDS("../data/IPF/meta.rds")
 
 #input phenotype
 cur_individual=unique(meta$individual)
 
 #input bulk
-rawM_bulk=readRDS(paste0(dir,"IPF/matrix_bulk.rds"))
-rawM_cell=readRDS(paste0(dir,"IPF/ind_cellnum.rds"))
+rawM_bulk=readRDS("../data/IPF/matrix_bulk.rds")
+rawM_cell=readRDS("../data/IPF/ind_cellnum.rds")
 rawM_bulk=t(apply(rawM_bulk,1,function(x) x*100/rawM_cell)) 
 colnames(rawM_bulk)=names(rawM_cell)
 logcount_data_bulk=log2(rawM_bulk+1)
 
 #input counts
-rawM=readRDS(paste0(dir,"IPF/rawM.rds"))
+rawM=readRDS("../data/IPF/rawM.rds")
 logcount_data=log2(rawM+1)
 dim(logcount_data)
 dim(meta)
 meta_ind=meta[match(unique(meta$individual),meta$individual),c("individual","diagnosis")]
 
-rdp=readRDS(paste0(dir,"IPF/ind_readdepth.rds"))
+rdp=readRDS("../data/IPF/ind_readdepth.rds")
 
 meta_ind$rdp=scale(rdp)
 meta_ind$individual=scale(as.numeric(meta_ind$individual))
@@ -234,10 +228,10 @@ t_col = function(color, percent = 60, name = NULL) {
 
 ```{r result_load,eval=runcode}
 #read_in
-opw_padj=readRDS(paste0(dir,"IPF/opw_padj.rds"))
+opw_padj=readRDS("../data/IPF/opw_padj.rds")
 gene_id=names(opw_padj[[1]])
-tmeta=readRDS(paste0(dir,"IPF/tmeta.rds"))
-cell_num_table=readRDS(paste0(dir,"IPF/cell_num_table.rds"))
+tmeta=readRDS("../data/IPF/tmeta.rds")
+cell_num_table=readRDS("../data/IPF/cell_num_table.rds")
 cluster=unique(tmeta$cluster)
 total_individual=unique(tmeta$individual)
 
@@ -405,13 +399,13 @@ for(i_cluster in c(7,11,2,8,12)){
   cur_pval=NA
   cur_padj=NA
   
-  cur_pval=readRDS(paste0(dir,"IPF/op_pval/op_pvalw.rds"))[[i_cluster]]
+  cur_pval=readRDS("../data/IPF/op_pval/op_pvalw.rds")[[i_cluster]]
   names(cur_pval)=gene_id
   names(cur_pval)=gsub("ABR_ENSG00000159842","ABR",names(cur_pval))
   cur_padj=p.adjust(cur_pval,method="fdr")
   
-  bcw_case=readRDS(paste0(dir,"IPF/op_pval/bcw_case.rds"))[[i_cluster]]
-  bcw_ctrl=readRDS(paste0(dir,"IPF/op_pval/bcw_ctrl.rds"))[[i_cluster]]
+  bcw_case=readRDS("../data/IPF/op_pval/bcw_case.rds")[[i_cluster]]
+  bcw_ctrl=readRDS("../data/IPF/op_pval/bcw_ctrl.rds")[[i_cluster]]
   
   cur_n=100
   
@@ -459,3 +453,11 @@ sessionInfo()
 ```
 
 # Reference
+
+Finak, G., McDavid, A., Yajima, M., Deng, J., Gersuk, V., Shalek, A. K., ... & Gottardo, R. (2015). MAST: a flexible statistical framework for assessing transcriptional changes and characterizing heterogeneity in single-cell RNA sequencing data. Genome biology, 16(1), 1-13.
+
+Love, M. I., Huber, W., & Anders, S. (2014). Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome biology, 15(12), 1-21.
+
+Xu, Y., Mizuno, T., Sridharan, A., Du, Y., Guo, M., Tang, J., ... & Whitsett, J. A. (2016). Single-cell RNA sequencing identifies diverse roles of epithelial cells in idiopathic pulmonary fibrosis. JCI insight, 1(20).
+
+Young, M. D., Wakefield, M. J., Smyth, G. K., & Oshlack, A. (2010). Gene ontology analysis for RNA-seq: accounting for selection bias. Genome biology, 11(2), 1-12.

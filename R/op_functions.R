@@ -9,7 +9,7 @@ decimalplaces <- function(x) {
 #' This function calculates the w2_pval based on BSDE for a given gene
 #' @param count_per_gene is a len x 1 matrix,length=cell num.  It represents gene count.
 #' @param meta_individual is a len x 1 vector, length=cell num. It represents individual labels.
-#' @param meta_individual is a len x 1 vector, length=cell num. It is indicator labels (contains 0,1) for cases (1) and controls(0)
+#' @param meta_phenotype is a len x 1 vector, length=cell num. It is indicator labels (contains 0,1) for cases (1) and controls(0)
 #' @param perm_num is a ingeter for times of permutation.
 #' @param merge_method provides the support package for barycenter calculation,
 #' the default setting is based on the python package 'ot'(merge_method="python"),

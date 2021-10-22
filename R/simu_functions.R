@@ -1,15 +1,17 @@
-#' this function returns the parameters for changing mean and variance of the zero-inflated negative binomial(ZINB) distribution
-#' @param mu the original parameter mu of ZINB distribtuion
-#' @param theta the original parameter theta of ZINB distribtuion, the distribution will be more close to zero-inflated poission with larger parameter size.
-#' @param drop the original parameter dropout_rate of of ZINB distribution
-#' @param r_m the targeted fold change of mean
-#' @param v_m the targeted fold change of variance
+#' Given a ZINB(\eqn{\mu}, \eqn{\theta}, \eqn{z}), returns ZINB(\eqn{\mu'}, \eqn{\theta'}, \eqn{z})
+#' such that the mean changes by a factor of \eqn{r_m} and the variance changes
+#' by a factor of \eqn{v_m}.
+#' @param mu parameter \eqn{\mu} of ZINB distribution.
+#' @param theta parameter \eqn{\theta} of ZINB distribution.
+#' @param drop dropout rate \eqn{z} of ZINB distribution.
+#' @param r_m targeted fold change of mean
+#' @param r_v targeted fold change of variance
 #'
-#' @return two number for parameter mu and theta of modified ZINB distribution
+#' @return \eqn{\mu'} and \eqn{\theta'} of the modified ZINB distribution
 #'
-#' @note For numerical meaningful calculation, is is required that r_m/r_v <1+mu/theta
-#'
-#' @example
+#' @note It is required that \eqn{r_m / r_v < 1 + \mu / \theta}.
+#' @export
+#' @examples
 #' calc_zinb_param(2,3,r_m=1.3)
 #' calc_zinb_param(2,3,r_v=1.5)
 #'
@@ -29,49 +31,49 @@ calc_zinb_param = function(mu,
   return(c(mu2, theta2))
 }
 
-#' This function returns the overdispersion parameters(size3) for the single ZINB distribution ZINB(mu_3, size_3, pi).
-#' This distribution has the same dropout_rate as the mixture of two ZINB with equal 50%-50% proportions
-#' The two ZINB have the same dropout_rate, same overdispersion (size) and the same distance of expectation from the mu_3,
-#' i.e. ZINB(mu_3(1+t),size,pi_3) and ZINB(mu_3(1-t),size,pi_3)
+
+#' For a given mixture \eqn{0.5 ZINB(\mu(1-t), \theta, z) + 0.5 ZINB(\mu(1+t), \theta, z)},
+#' return \eqn{ZINB(\mu, \theta', z)} such that both mean and variance match.
 #'
-#' @param size parameter theta of the zinb model, the distribution will be more close to zero-inflated poission with larger parameter size.
-#' @param parameter t as the numeric 0<=t<=1
-#' @return size3 The parameter theta in the notation
-#' @example calc_multimod_param(25,t=0.3)
+#' @param size parameter \eqn{\theta} of the ZINB model.
+#' @param t Parameter \eqn{t} (between 0 and 1).
+#' @return Parameter \eqn{\theta'} of the output ZINB model.
+#' @export
+#'
 calc_multimod_param = function(size, t = 0.5) {
   size3 = size / (size * t ^ 2 + t ^ 2 + 1)
   size3
 }
 
-#' This function works for the basic parameter generation of ZINB models from the given reference data.
-#' @discription The reference data is as the format of the output of DCA.
-#'  The reference data includes the gene x cell matrices of the mean, dipersion and dropout rate
-#' The reference data also includes a meta parameter, which is the dataframe for cell features.
-#' The feature named as "individual" is necessary for individual information.
-#' The the feature "RIN" is also necessary if parameter RIN_adj=TRUE.
-#' @param t_mean a genexcell matrix, represent the mu parameter of ZINB models from reference data. DCA can generate it.
-#' @param t_disp a genexcell matrix, represent the overdispersion parameter of ZINB models from reference data. DCA can generate it.
-#' @param t_drop a genexcell matrix, represent the dropout_rate parameter of ZINB models from reference data. DCA can generate it.
-#' @param nTotal numbers of genes needs to be simulated
-#' @param nTotal numbers of subjects needs to be simulated
-#' @return a list includes two objects sample_ctrl and RNA.simu
-#' @return sample_ctrl is a gene x individual x param array, which gives the parameter "mean", "dispersion", and "dropout" for simulate a ZINB distribution.
-#' It also gives the residual standard deviations of means.
+#' Given parameters of a reference dataset, calculate the ZINB parameters for
+#' simulating a new dataset of a different size.
+#' @description The basic parameters of ZINB(\eqn{\mu}, \eqn{\theta}, \eqn{z}) from the reference dataset can be
+#' estimated with DCA (Deep Count Autoencoder).
+#' @param t_mean mean parameter matrix \eqn{\mu} of the reference dataset (gene x cell).
+#' @param t_disp dispersion parameter matrix \eqn{\theta} of the reference dataset (gene x cell).
+#' @param t_drop dropout parameter matrix \eqn{z} of the reference dataset (gene x cell).
+#' @param t_meta Data frame (nrow = cell) of meta information.
+#'   It must contain a column \code{individual} recording from which subject each cell is collected.
+#'   If \code{RIN_adj=TRUE}, then it must also contain column \code{RIN} for RNA integrity number.
+#' @param nTotal numbers of genes to simulate
+#' @param RIN_adj If \code{TRUE}, then \code{t_meta} must contain column \code{RIN} for RNA integrity number.
+#'   (default: FALSE)
+#' @param nall numbers of individuals to simulate
+#' @return a list containing:
+#'  \itemize{
+#'  \item \code{sample_ctrl}: gene x individual x param array,
+#'    which gives the parameter \eqn{\mu}, \eqn{\theta} and \eqn{z} of ZINB for simulation.
+#'  \item \code{RNA.simu}: residual standard deviations of means.
+#'  }
+#' @export
+#' @references Eraslan, G., Simon, L. M., Mircea, M., Mueller, N. S., & Theis, F. J. (2019). Single-cell RNA-seq denoising using a deep count Autoencoder. Nature Communications, 10(1), 1-14.
 #'
-#'
-#' @references Eraslan, G., Simon, L. M., Mircea, M., Mueller, N. S., & Theis, F. J. (2019). Single-cell RNA-seq denoising using a deep count autoencoder. Nature communications, 10(1), 1-14.
-#'
-simu_base_param=function(t_mean,t_disp,t_drop,t_meta,nTotal=30,nall=40, RIN_adj=TRUE){
+simu_base_param=function(t_mean, t_disp, t_drop, t_meta, nTotal=30, nall=40, RIN_adj=FALSE){
   #cell mean sum adj
   cell_mean_sum = colSums(t_mean)
   summary(cell_mean_sum)
   t_mean_adj = t(t(t_mean) * (10000 / cell_mean_sum))
-  ############### collect sample information ###################
-
-  col_info   = strsplit(colnames(t_mean), split = "_")
-  sample_ids = sapply(col_info, function(x)
-    x[2])
-  table(sample_ids)
+  sample_ids=t_meta$individual
 
   tapply_mean <-
     function(x) {
@@ -81,12 +83,12 @@ simu_base_param=function(t_mean,t_disp,t_drop,t_meta,nTotal=30,nall=40, RIN_adj=
   tapply_median <-
     function(x) {
       tapply(x, sample_ids, function(x)
-        return(median(x, na.rm = TRUE)))
+        return(stats::median(x, na.rm = TRUE)))
     }
   tapply_sd <-
     function(x) {
       tapply(x, sample_ids, function(x)
-        return(sd(x, na.rm = TRUE)))
+        return(stats::sd(x, na.rm = TRUE)))
     }
   tapply_1 <- function(x) {
     tapply(x, sample_ids, function(x)
@@ -110,7 +112,7 @@ simu_base_param=function(t_mean,t_disp,t_drop,t_meta,nTotal=30,nall=40, RIN_adj=
   sample_log_mean_adj = log(mid_mean_adj)
 
   # log residual sd
-  xmt = model.matrix( ~ scale(log(cell_mean_sum)))
+  xmt = stats::model.matrix( ~ scale(log(cell_mean_sum)))
   dim(xmt)
   xmt[1:2, ]
   log_t_mean_adj   = log(t_mean_adj)
@@ -119,7 +121,7 @@ simu_base_param=function(t_mean,t_disp,t_drop,t_meta,nTotal=30,nall=40, RIN_adj=
   coef = matrix(NA, nrow = nrow(log_t_mean_adj), ncol = 2)
   for (i in 1:nrow(log_t_mean_adj)) {
     yi = log_t_mean_adj[i, ]
-    li = lm.fit(x = xmt, y = yi)
+    li = stats::lm.fit(x = xmt, y = yi)
     coef[i, ] = li$coefficients
     log_t_mean_resid[i, ] = li$residuals
   }
@@ -183,8 +185,8 @@ simu_base_param=function(t_mean,t_disp,t_drop,t_meta,nTotal=30,nall=40, RIN_adj=
     cor_test = cov_matrix
     for (i in 1:ncol(sample_data)) {
       for (j in 1:ncol(sample_data)) {
-        cov_matrix[i, j] = cov(sample_data[, i], sample_data[, j])
-        cor_test[i, j] = cor.test(sample_data[, i], sample_data[, j])$p.value
+        cov_matrix[i, j] = stats::cov(sample_data[, i], sample_data[, j])
+        cor_test[i, j] = stats::cor.test(sample_data[, i], sample_data[, j])$p.value
       }
     }
 
@@ -194,11 +196,11 @@ simu_base_param=function(t_mean,t_disp,t_drop,t_meta,nTotal=30,nall=40, RIN_adj=
     RIN.simu=NA
     if(RIN_adj==TRUE){
       log_mean_ig = sample_data2[, 1]
-      lmi  = lm(log_mean_ig ~ sample_meta$RIN)
+      lmi  = stats::lm(log_mean_ig ~ sample_meta$RIN)
       beta = lmi$coefficients
       # add some extra variance for the mean parameter
-      e1 = rnorm(nall, mean = 0, sd = sqrt(cov_matrix[1, 1]))
-      RIN.simu = rnorm(nall)
+      e1 = stats::rnorm(nall, mean = 0, sd = sqrt(cov_matrix[1, 1]))
+      RIN.simu = stats::rnorm(nall)
       log_mean_ig_simu = beta[1] + beta[2] * RIN.simu + e1
       for (j in 1:nall) {
         sample_data_mean_j    = sample_data_mean
@@ -208,7 +210,7 @@ simu_base_param=function(t_mean,t_disp,t_drop,t_meta,nTotal=30,nall=40, RIN_adj=
       }
     }
     if(RIN_adj==FALSE){
-      sample_ctrl[ig,,]=exp(MASS::mvrnorm(nall, mu = sample_data_mean_j, Sigma = cov_matrix,empirical = TRUE))
+      sample_ctrl[ig,,]=exp(MASS::mvrnorm(nall, mu = sample_data_mean, Sigma = cov_matrix,empirical = TRUE))
     }
   }
 

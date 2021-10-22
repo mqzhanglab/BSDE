@@ -2,27 +2,36 @@
 % Please edit documentation in R/simu_functions.R
 \name{calc_zinb_param}
 \alias{calc_zinb_param}
-\title{this function returns the parameters for changing mean and variance of the zero-inflated negative binomial(ZINB) distribution}
+\title{Given a ZINB(\eqn{\mu}, \eqn{\theta}, \eqn{z}), returns ZINB(\eqn{\mu'}, \eqn{\theta'}, \eqn{z})
+such that the mean changes by a factor of \eqn{r_m} and the variance changes
+by a factor of \eqn{v_m}.}
 \usage{
 calc_zinb_param(mu, theta, drop = 0, r_m = 1, r_v = 1)
 }
 \arguments{
-\item{mu}{the original parameter mu of ZINB distribtuion}
+\item{mu}{parameter \eqn{\mu} of ZINB distribution.}
 
-\item{theta}{the original parameter theta of ZINB distribtuion, the distribution will be more close to zero-inflated poission with larger parameter size.}
+\item{theta}{parameter \eqn{\theta} of ZINB distribution.}
 
-\item{drop}{the original parameter dropout_rate of of ZINB distribution}
+\item{drop}{dropout rate \eqn{z} of ZINB distribution.}
 
-\item{r_m}{the targeted fold change of mean}
+\item{r_m}{targeted fold change of mean}
 
-\item{v_m}{the targeted fold change of variance}
+\item{r_v}{targeted fold change of variance}
 }
 \value{
-two number for parameter mu and theta of modified ZINB distribution
+\eqn{\mu'} and \eqn{\theta'} of the modified ZINB distribution
 }
 \description{
-this function returns the parameters for changing mean and variance of the zero-inflated negative binomial(ZINB) distribution
+Given a ZINB(\eqn{\mu}, \eqn{\theta}, \eqn{z}), returns ZINB(\eqn{\mu'}, \eqn{\theta'}, \eqn{z})
+such that the mean changes by a factor of \eqn{r_m} and the variance changes
+by a factor of \eqn{v_m}.
 }
 \note{
-For numerical meaningful calculation, is is required that r_m/r_v <1+mu/theta
+It is required that \eqn{r_m / r_v < 1 + \mu / \theta}.
+}
+\examples{
+calc_zinb_param(2,3,r_m=1.3)
+calc_zinb_param(2,3,r_v=1.5)
+
 }

@@ -2,31 +2,46 @@
 % Please edit documentation in R/op_functions.R
 \name{cal_w2_bulk_pval}
 \alias{cal_w2_bulk_pval}
-\title{This function calculates the w2_pval based on BSDE for a given gene, based on bulk RNAseq.
-The expression are represented as one numerical value per gene, per individual.}
+\title{Calculate p-value for a given gene based on bulk RNAseq.
+The expressions are represented as one numerical value per gene, per individual.}
 \usage{
 cal_w2_bulk_pval(
   cur_ind_count,
   cur_individual,
   phenotype,
   perm_num = 500,
-  unif_round_unit = 0.5
+  unif_round_unit = 0.2
 )
 }
 \arguments{
-\item{count_per_gene:}{len x 1 matrix,length=ind num,  gene count}
+\item{cur_ind_count}{vector of gene counts (length = number of individuals).}
 
-\item{meta_individual:}{len x 1 vector, length=ind num, indicator labels (contains 0,1)}
+\item{cur_individual}{individual annotations (length = number of individuals).}
 
-\item{perm_num:ingeter, }{permutation time}
+\item{phenotype}{0/1 individual labels (length = number of individuals, 0=control, 1=case).}
+
+\item{perm_num}{number of permutations for computing p-value (integer).}
+
+\item{unif_round_unit}{Bin width for empirical histogram (default: 0.2).}
 }
 \value{
 a list contains:
-pval a p-value, from the based on Monte Carlo Permutation Procedure.
-case_distr a vectors contains the density of case subjects distribution of Barycenter
-ctrl_distr a vectors contains the density of ctrl subjects distribution of Barycenter
+\itemize{
+\item pval: p-value
+\item case_distr: density of the aggregated Barycenter distribution of the cases
+\item ctrl_distr: density of the aggregated Barycenter distribution of the controls
+}
 }
 \description{
-This function calculates the w2_pval based on BSDE for a given gene, based on bulk RNAseq.
-The expression are represented as one numerical value per gene, per individual.
+Calculate p-value for a given gene based on bulk RNAseq.
+The expressions are represented as one numerical value per gene, per individual.
+}
+\examples{
+\dontrun{
+count_per_gene=c(rpois(6,10),c(rpois(6,4)))
+meta_individual=paste0("ind",rep(1:12,each=1))
+meta_phenotype=c(rep(1,6),rep(0,6))
+cal_w2_bulk_pval(count_per_gene,meta_individual,meta_phenotype)
+}
+
 }

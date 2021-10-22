@@ -2,24 +2,20 @@
 % Please edit documentation in R/simu_functions.R
 \name{calc_multimod_param}
 \alias{calc_multimod_param}
-\title{This function returns the overdispersion parameters(size3) for the single ZINB distribution ZINB(mu_3, size_3, pi).
-This distribution has the same dropout_rate as the mixture of two ZINB with equal 50%-50% proportions
-The two ZINB have the same dropout_rate, same overdispersion (size) and the same distance of expectation from the mu_3,
-i.e. ZINB(mu_3(1+t),size,pi_3) and ZINB(mu_3(1-t),size,pi_3)}
+\title{For a given mixture \eqn{0.5 ZINB(\mu(1-t), \theta, z) + 0.5 ZINB(\mu(1+t), \theta, z)},
+return \eqn{ZINB(\mu, \theta', z)} such that both mean and variance match.}
 \usage{
 calc_multimod_param(size, t = 0.5)
 }
 \arguments{
-\item{size}{parameter theta of the zinb model, the distribution will be more close to zero-inflated poission with larger parameter size.}
+\item{size}{parameter \eqn{\theta} of the ZINB model.}
 
-\item{parameter}{t as the numeric 0<=t<=1}
+\item{t}{Parameter \eqn{t} (between 0 and 1).}
 }
 \value{
-size3 The parameter theta in the notation
+Parameter \eqn{\theta'} of the output ZINB model.
 }
 \description{
-This function returns the overdispersion parameters(size3) for the single ZINB distribution ZINB(mu_3, size_3, pi).
-This distribution has the same dropout_rate as the mixture of two ZINB with equal 50%-50% proportions
-The two ZINB have the same dropout_rate, same overdispersion (size) and the same distance of expectation from the mu_3,
-i.e. ZINB(mu_3(1+t),size,pi_3) and ZINB(mu_3(1-t),size,pi_3)
+For a given mixture \eqn{0.5 ZINB(\mu(1-t), \theta, z) + 0.5 ZINB(\mu(1+t), \theta, z)},
+return \eqn{ZINB(\mu, \theta', z)} such that both mean and variance match.
 }

@@ -2,7 +2,8 @@
 % Please edit documentation in R/simu_functions.R
 \name{simu_base_param}
 \alias{simu_base_param}
-\title{This function works for the basic parameter generation of ZINB models from the given reference data.}
+\title{Given parameters of a reference dataset, calculate the ZINB parameters for
+simulating a new dataset of a different size.}
 \usage{
 simu_base_param(
   t_mean,
@@ -11,27 +12,39 @@ simu_base_param(
   t_meta,
   nTotal = 30,
   nall = 40,
-  RIN_adj = TRUE
+  RIN_adj = FALSE
 )
 }
 \arguments{
-\item{t_mean}{a genexcell matrix, represent the mu parameter of ZINB models from reference data. DCA can generate it.}
+\item{t_mean}{mean parameter matrix \eqn{\mu} of the reference dataset (gene x cell).}
 
-\item{t_disp}{a genexcell matrix, represent the overdispersion parameter of ZINB models from reference data. DCA can generate it.}
+\item{t_disp}{dispersion parameter matrix \eqn{\theta} of the reference dataset (gene x cell).}
 
-\item{t_drop}{a genexcell matrix, represent the dropout_rate parameter of ZINB models from reference data. DCA can generate it.}
+\item{t_drop}{dropout parameter matrix \eqn{z} of the reference dataset (gene x cell).}
 
-\item{nTotal}{numbers of subjects needs to be simulated}
+\item{t_meta}{Data frame (nrow = cell) of meta information.
+It must contain a column \code{individual} recording from which subject each cell is collected.
+If \code{RIN_adj=TRUE}, then it must also contain column \code{RIN} for RNA integrity number.}
+
+\item{nTotal}{numbers of genes to simulate}
+
+\item{nall}{numbers of individuals to simulate}
+
+\item{RIN_adj}{If \code{TRUE}, then \code{t_meta} must contain column \code{RIN} for RNA integrity number.
+(default: FALSE)}
 }
 \value{
-a list includes two objects sample_ctrl and RNA.simu
-
-sample_ctrl is a gene x individual x param array, which gives the parameter "mean", "dispersion", and "dropout" for simulate a ZINB distribution.
-It also gives the residual standard deviations of means.
+a list containing:
+\itemize{
+\item \code{sample_ctrl}: gene x individual x param array,
+which gives the parameter \eqn{\mu}, \eqn{\theta} and \eqn{z} of ZINB for simulation.
+\item \code{RNA.simu}: residual standard deviations of means.
+}
 }
 \description{
-This function works for the basic parameter generation of ZINB models from the given reference data.
+The basic parameters of ZINB(\eqn{\mu}, \eqn{\theta}, \eqn{z}) from the reference dataset can be
+estimated with DCA (Deep Count Autoencoder).
 }
 \references{
-Eraslan, G., Simon, L. M., Mircea, M., Mueller, N. S., & Theis, F. J. (2019). Single-cell RNA-seq denoising using a deep count autoencoder. Nature communications, 10(1), 1-14.
+Eraslan, G., Simon, L. M., Mircea, M., Mueller, N. S., & Theis, F. J. (2019). Single-cell RNA-seq denoising using a deep count Autoencoder. Nature Communications, 10(1), 1-14.
 }

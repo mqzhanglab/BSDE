@@ -3,8 +3,7 @@ title: "An Introduction to BSDE"
 author: "Mengqi Zhang, Richard Guo"
 date: "`r Sys.Date()`"
 output:
-  BiocStyle::html_document:
-    toc: true
+  pdf_document
 vignette: >
   %\VignetteEncoding{UTF-8}
 ---
@@ -13,74 +12,80 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  echo=TRUE, cache = !TRUE, warning = FALSE, 
+  echo=TRUE, cache = FALSE, warning = FALSE, 
   message = FALSE, cache.lazy = FALSE
 )
-runcode=!FALSE
-
 library("BSDE")
 ```
-
-# Introduction
 
 This markdown includes two parts. 
 
-The first parts gives a pure guide for the core usage of BSDE. 
+The first parts gives a guide for the core usage of BSDE. 
 
-The second part includes an example usage of BSDE on real data analysis.The second parts also includes the DE analysis with the [MAST](https://www.bioconductor.org/packages/release/bioc/html/MAST.html) packages(for scRNAseq) and the [DESeq2](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html) packages(for bulk RNAseq) for comparison. This markdown is for individual case-control study based on Barycenter and Wasserstein distance estimation on the gene differential expression (DE) analysis of certain cell type based on simulated scRNAseq data from zero-inflated negative binomial (ZINB) distribution. 
+The second part includes an example of using BSDE on real data. 
 
 # Installation
 
-BSDE can be installed through githubs.
-```{r install,eval=!runcode}
-install.packages("devtools")
-library(devtools)
-install_github("mqzhanglab/BSDE")
+BSDE can be installed from GitHub.
+```{r install,eval=FALSE,echo=TRUE}
+# install.packages("devtools")
+devtools::install_github("mqzhanglab/BSDE")
 ```
 
-# Part I: Pure instruction for BSDE
+# Part I: Core function of BSDE
 
-The core function from BSDE is cal_w2_pval. It calculates the p-values gene by gene, in most situation, the log-transformed genes are recommended for a better estimation.
+The core function from BSDE is `cal_w2_pval`. It calculates the p-values gene by gene. 
+In most situation, the log-transformed expressions are recommended.
 
-cal_w2_pval has the following parameters, while the **count_per_gene**,  **meta_individual** and **meta_phenotype** are three required input.
-
-**count_per_gene** is a len x 1 matrix,length=cell num.  It represents gene count.
-**meta_individual** is a len x 1 vector, length=cell num. It represents individual labels.
-**meta_phenotype** is a len x 1 vector, length=cell num. It is indicator labels (contains 0,1) for cases (1) and controls(0)
-**perm_num** is a ingeter for times of permutation.
-**merge_method** provides the support package for barycenter calculation, the default setting is based on the python package 'ot'(merge_method="python"), if python doesn't work, the R package merge_method="R" is also available
-**unif_round_unit** is the unit length for frequency calculation.
-**l_fold** is a positive number, represents the fold-change to the parameter lamda for merge_method R, the **lambda** is the Non-negative regularization parameter (for small lambda the Barycenter is close to the EMD).
-**weight** is a len x 1 vector, length=subjects num. It represents the importance for subjects.
-**shrink** is a bool value. If True, the range with zero density will be removed, for more robust performance to extreme values and reduce the computational burden. Choose TRUE if there are some extereme high expressions.
-
+`cal_w2_pval` has three required inputs:
+`count_per_gene`,  `meta_individual` and `meta_phenotype`.
 
 This function return a list, which contains:
-**pval**: a p-value, from the based on Monte Carlo Permutation Procedure.
-**case_bc_ob**: a vectors contains the density of case subjects distribution of Barycenter
-**ctrl_bc_ob**: a vectors contains the density of ctrl subjects distribution of Barycenter
+* `pval`: p-value
+* `case_bc_ob`: density vector of the Barycenter distribution from cases
+* `ctrl_bc_ob`: density vector of the Barycenter distribution from controls
 
-For example.
+## Example
 
-```{r pure_example,eval=!runcode}
+```{r pure_example_package,eval=TRUE,echo=TRUE}
 library("BSDE")
-library("reticulate")
-library("doRNG")
-count_per_gene=c(rpois(60,6),c(rpois(60,4)))
-meta_individual=paste0("ind",rep(1:12,each=10))
-meta_phenotype=c(rep(1,60),rep(0,60))
-BSDE::cal_w2_pval(count_per_gene,meta_individual,meta_phenotype )
+library("ggplot2")
 ```
 
+Suppose we have 12 subjects (6 cases and 6 controls), where each subject has 10 cells.
 
+```{r pure_example_setting,eval=TRUE,echo=TRUE}
+count_per_gene=c(rpois(60,6),c(rpois(60,4)))
+meta_individual=paste0("ind",rep(1:12,each=10))
+meta_phenotype=factor(c(rep(1,60),rep(0,60)))
 
-# Part II: An example for data analysis application on simulated datasets
+# show dataset
+table(meta_individual)
+table(meta_phenotype)
 
-Here we present a demo version of our simulation here, which are minimized and based on the DCA output of the 10% autism dataset with top 100 expressed genes.
+# expressions
+df=data.frame(count=count_per_gene,ind=meta_individual, diagnosis=meta_phenotype)
+ggplot(df,aes(x=count,color=diagnosis,fill=diagnosis,group=ind))+ geom_density(alpha=0.05)+ theme_classic()
+```
 
-In this simulation example, we will generate 30 genes from a particular type of cell of 20 case subjects and 20 control subjects, with each subjects have 100 cells. We simulate the basic parameters, i.e., the mean, dispersion and dropout parameter from the distribution of the real reference scRNAseq database from paper [Single-cell genomics identifies cell type–specific molecular changes in autism](https://science.sciencemag.org/content/364/6441/685.abstract).
+Let us calculate the p-value.
+```{r pure_example_res,eval=TRUE,echo=TRUE}
+results <- cal_w2_pval(count_per_gene,meta_individual,meta_phenotype)
+print(results[[1]])
+plot(results[[2]], type="l", col="red", xlab="expression", ylab="density")
+lines(results[[3]], col="blue")
+legend("topright", c("case", "control"), lwd=c(1,1), col=c("red", "blue"))
+```
 
-Within this 30 genes, we simulate 4 different type of DEs by adding on particular ratios to the basic parameters to get expected fold changes, the rest genes are simulated without size factors and as controls
+# Part II: Data analysis example
+
+Here we present a demo simulation here. 
+The simulation is based on a real autism dataset from this [paper](https://doi.org/10.1126/science.aav8130).
+
+We generate 30 genes (from a particular cell type) for 20 case subjects and 20 control subjects. 
+Each subject comes with 20 cells. 
+
+We simulate 4 different types of differential expressions (DEs) by adding on particular ratios to the basic parameters to get expected fold changes, the rest genes are simulated without size factors and as controls
 
 (1). mean DE: 3 genes are DE in mean but not in var (size factor 1.2).
 (2).var DE: 3 genes are DE in var but not mean(size factor 1.2).
@@ -88,7 +93,7 @@ Within this 30 genes, we simulate 4 different type of DEs by adding on particula
 (4).disp DE: 3 genes are DE in dispersion (size factor 0.2).
 
 Please see our [simulation guide](https://github.com/mqzhanglab/BSDE/tree/main/simulation) for more details. 
-```{r meta_simulation,eval=runcode}
+```{r meta_simulation,eval=TRUE,echo=TRUE}
 sim_matrix=readRDS("../data/simulated/sim_matrix_1.2_1.2_0.6_0.2.rds")
 sim_matrix_bulk=readRDS("../data/simulated/sim_matrix_bulk_1.2_1.2_0.6_0.2.rds")
 meta=readRDS("../data/simulated/sim_meta_1.2_1.2_0.6_0.2.rds")
@@ -98,11 +103,83 @@ meta=readRDS("../data/simulated/sim_meta_1.2_1.2_0.6_0.2.rds")
 ## Differential Expressed Analysis
 We calculate the p-values of the simulated genes through the BSDE method as well as the [MAST](https://www.bioconductor.org/packages/release/bioc/html/MAST.html) (with a widely used protocol mixed-effect model "glmer" & Likelihood-ratio Test) and the [DESeq2](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html).
 
+## BSDE
+We also calculate the p-values using the BSDE as follows.We can either run it one-by-one with the major command for BSDE is cal_w2_pval. Or we can start from SingleCellExperiment objects.
+
+```{r BSDE0,eval=FALSE,echo=FALSE}
+library("BSDE")
+
+sim_matrix_log = log2(1 + sim_matrix) #log transformed data
+
+dim(sim_matrix_log)
+sim_matrix_log[1:2, 1:5]
+
+op_pval = matrix(ncol = 1, nrow = nrow(sim_matrix_log))
+
+print(date())
+print(gc())
+
+for (i_g in 1:nrow(sim_matrix_log)) {
+  cur_sim = sim_matrix_log[i_g, ]
+  cur_ind = meta$individual
+  cur_pheno = meta$phenotype
+  
+  op_pval[i_g] = tryCatch({
+    cal_w2_pval(
+      count_per_gene = cur_sim,
+      meta_individual = cur_ind,
+      meta_phenotype = cur_pheno,
+      perm_num = 500,
+      unif_round_unit = 0.5
+    )[[1]]
+  }, error = function(e) {
+    NA
+  })
+}
+print(date())
+print(gc())
+
+rownames(op_pval) = gene_id
+length(pval)
+pval[1:5]
+```
+
+```{r BSDE1,eval=TRUE,echo=TRUE}
+library("BSDE")
+library("Barycenter")
+library("scater")
+library("SingleCellExperiment")
+library("reticulate")
+library("doRNG")
+library("doParallel")
+py_run_file("../inst/op_functions.py")
+```
+
+The input data could be a SingleCellExperiment objects with the "counts" in assays, a rowData named "gene_id" as gene_names and two columns named as "individual" and "condition". The "individual" is a factor that represents individual labels. The "condition" is a numerical that is indicator (contains 0,1).
+```{r BSDE2,eval=TRUE,echo=TRUE}
+gene_id = rownames(sim_matrix)   #get the gene id from the data
+meta$condition <- meta$phenotype
+sce=SingleCellExperiment::SingleCellExperiment(list(counts=sim_matrix),colData=meta,rowData=gene_id)
+```
+
+Then we use the function BSDE to calculate the p-values.
+```{r BSDE2,eval=TRUE,echo=TRUE}
+pval=BSDE::BSDE(sce)
+```
+
+The result is a list of p-values. To keep the format in accordance with the input, the model failure results are represented as NA.
+```{r BSDE2,eval=TRUE,echo=TRUE}
+length(pval)
+pval[1:5]
+```
+
+
+
 ## DESeq2
 
 For DESeq2 analysis, we construct the bulk RNAseq situation though suming up the counts per gene, per cluster, per individual, per 1000 cells.
 
-```{r deseq2,eval=runcode}
+```{r deseq2,eval=FALSE}
 library("DESeq2")
 cur_info = meta[, c("individual", "phenotype")]
 cur_info = unique(cur_info)
@@ -122,7 +199,7 @@ deseq_pval = results(dds)$pvalue
 ## MAST
 
 We take the method of current usage of MAST, we get the p-values based on the Hurdle model ("H" model)
-```{r MAST,eval=runcode}
+```{r MAST,eval=FALSE}
 library("MAST")
 library("lme4")
 
@@ -164,46 +241,11 @@ print(gc())
 
 ```
 
-## BSDE
-We also calculate the p-values using the BSDE as follows.The major command for BSDE is cal_w2_pval. The required information includes
-
-```{r BSDE,eval=runcode}
-library("BSDE")
-
-op_pval = matrix(ncol = 1, nrow = nrow(sim_matrix_log))
-
-print(date())
-print(gc())
-
-for (i_g in 1:nrow(sim_matrix_log)) {
-  cur_sim = sim_matrix_log[i_g, ]
-  cur_ind = meta$individual
-  cur_pheno = meta$phenotype
-  
-  op_pval[i_g] = tryCatch({
-    cal_w2_pval(
-      count_per_gene = cur_sim,
-      meta_individual = cur_ind,
-      meta_phenotype = cur_pheno,
-      perm_num = 500,
-      unif_round_unit = 0.5
-    )[[1]]
-  }, error = function(e) {
-    NA
-  })
-}
-print(date())
-print(gc())
-
-rownames(op_pval) = gene_id
-
-```
-
 ## Further Analysis and Method Evaluation
 Once we have the p-values, we can do further analysis on the method evaluation.For example, we can calculate the proportion of p-values < 0.05. We can also draw similar plot for power, where power is calculated as the proportion of p-values < 0.05 in permuted data. 
 
 # Session Information
-```{r ,eval=runcode}
+```{r ,eval=TRUE}
 sessionInfo()
 ```
 

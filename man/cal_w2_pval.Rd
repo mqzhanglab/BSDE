@@ -2,7 +2,7 @@
 % Please edit documentation in R/op_functions.R
 \name{cal_w2_pval}
 \alias{cal_w2_pval}
-\title{This function calculates the w2_pval based on BSDE for a given gene}
+\title{This function calculates the BSDE Barycenter p-value of a given gene.}
 \usage{
 cal_w2_pval(
   count_per_gene,
@@ -10,51 +10,37 @@ cal_w2_pval(
   meta_phenotype,
   perm_num = 200,
   unif_round_unit = 0.2,
-  l_fold = 1,
-  merge_method = "python",
   weight = 1,
   shrink = FALSE
 )
 }
 \arguments{
-\item{count_per_gene}{is a len x 1 matrix,length=cell num.  It represents gene count.}
+\item{count_per_gene}{Gene count. Vector of length n (n is number of cells).}
 
-\item{meta_individual}{is a len x 1 vector, length=cell num. It is indicator labels (contains 0,1) for cases (1) and controls(0)}
+\item{meta_individual}{Label of individuals (length n).}
 
-\item{perm_num}{is a ingeter for times of permutation.}
+\item{meta_phenotype}{0/1 vector of length n (0=control, 1=case).}
 
-\item{unif_round_unit}{is the unit length for frequency calculation.}
+\item{perm_num}{Number of random permutations for computing p-value.}
 
-\item{l_fold}{is a positive number, represents the fold-change to the parameter lamda for merge_method R, the lambda is the Non-negative regularization parameter (for small lambda the Barycenter is close to the EMD).}
+\item{unif_round_unit}{Bin width for empirical histogram (default: 0.2).}
 
-\item{merge_method}{provides the support package for barycenter calculation,
-the default setting is based on the python package 'ot'(merge_method="python"),
-if python doesn't work, the R package merge_method="R" is also available}
+\item{weight}{Weight vector (non-negative, length=number of subjects) for subjects.
+Can be used for inverse probability weighting to control for confounding.
+Default: 1 for equal weights.}
 
-\item{weight}{is a len x 1 vector, length=subjects num. It represents the importance for subjects.}
-
-\item{shrink}{is a bool value. If True, the range with zero density will be removed, for more robust performance to extreme values and reduce the computational burden. Choose TRUE if there are some extereme high expressions.}
+\item{shrink}{If \code{TRUE}, the range with zero count will be removed to
+cope with sparsity and speed up the computation. Use \code{TRUE} if
+extremely high expressions are present. Default: \code{FALSE}.}
 }
 \value{
 a list contains:
-pval a p-value, from the based on Monte Carlo Permutation Procedure.
-case_bc_ob a vectors contains the density of case subjects distribution of Barycenter
-ctrl_bc_ob a vectors contains the density of ctrl subjects distribution of Barycenter
+\itemize{
+\item pval: p-value
+\item case_bc_ob: density of the aggregated Barycenter distribution of the cases
+\item ctrl_bc_ob: density of the aggregated Barycenter distribution of the controls
+}
 }
 \description{
-This function calculates the w2_pval based on BSDE for a given gene
-}
-\examples{
-library("Barycenter")
-library("Rcpp")
-library("reticulate")
-library("doRNG")
-library("doParallel")
-py_run_file("../inst/op_functions.py")
-
-count_per_gene=c(rpois(60,6),c(rpois(60,4)))
-meta_individual=paste0("ind",rep(1:12,each=10))
-meta_phenotype=c(rep(1,60),rep(0,60))
-cal_w2_pval(count_per_gene,meta_individual,meta_phenotype )
-cal_w2_pval(count_per_gene,meta_individual,meta_phenotype,unif_round_unit = 1 )
+This function calculates the BSDE Barycenter p-value of a given gene.
 }

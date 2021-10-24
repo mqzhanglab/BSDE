@@ -5,7 +5,7 @@
 ## Installation
 ```r
 # install.packages("devtools")
-devtools::install_github("mqzhanglab/BSDE")
+devtools::install_github("mqzhanglab/BSDE", build_vignettes = TRUE)
 ```
 
 In case of missing dependency, the following R packages need to be installed from [BioConductor](https://bioconductor.org/):

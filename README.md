@@ -1,6 +1,5 @@
 # BSDE: Barycenter Single-cell RNAseq Differential Expression analysis for case-control studies
-
-![alt text](https://github.com/mqzhanglab/BSDE/blob/main/data/Fig1.png?raw=true)
+<img src="doc/Fig1.png" alt="rstudio" style="zoom:60%;" />
 
 
 ## Installation
@@ -37,13 +36,11 @@ But if that fails, you can install manually:
 
 If you are using [RStudio](https://www.rstudio.com/), make sure the Python interpreter is not overridden to something else. In the `Preferences` → `Python`, select interpreter from the `r-reticulate` conda environment. Then, restart R and try `library(BSDE)`. You should be able to see message "Python environment loaded".
 
-<img src="docs/rstudio.png" alt="rstudio" style="zoom:40%;" />
+<img src="doc/rstudio.png" alt="rstudio" style="zoom:40%;" />
 
 
 
-## Examples
+## Vignette
 
-See [here](https://github.com/mqzhanglab/BSDE/blob/main/simulation) to find examples based on the simulated data.
-
-See [here](https://github.com/mqzhanglab/BSDE/blob/main/realdata_analysis) to find the example for the real data analysis about the [idiopathic pulmonary fibrosis](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5135277/).
+Call `vignette("BSDE")` to see a short introduction.
 

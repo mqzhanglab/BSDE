@@ -8,6 +8,7 @@ Description: Single-cell RNAseq differential expression analysis for
     case-control studies using optimal transport.
 License: MIT + file LICENSE
 URL: https://github.com/mqzhanglab/BSDE
+BugReports: https://github.com/mqzhanglab/BSDE/issues
 Depends:
     R (>= 3.5.0)
 Imports: 

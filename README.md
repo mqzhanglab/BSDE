@@ -36,7 +36,7 @@ But if that fails, you can install manually:
 
 If you are using [RStudio](https://www.rstudio.com/), make sure the Python interpreter is not overridden to something else. In the `Preferences` → `Python`, select interpreter from the `r-reticulate` conda environment. Then, restart R and try `library(BSDE)`. You should be able to see message "Python environment loaded".
 
-<img src="doc/rstudio.png" alt="rstudio" style="zoom:40%;" />
+<img src="doc/rstudio.png" alt="rstudio" style="zoom:30%;" />
 
 
 

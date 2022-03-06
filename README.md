@@ -40,7 +40,8 @@ If you are using [RStudio](https://www.rstudio.com/), make sure the Python inter
 
 
 
-## Vignette
+## Documents
 
-Call `vignette("BSDE")` to see a short introduction.
+- Call `vignette("BSDE")` to see a short introduction.
+- See [here](https://github.com/mqzhanglab/BSDE_pipeline) for examples on data analysis. 
 

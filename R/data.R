@@ -13,6 +13,7 @@
 #' indicator vector (1 for differential expression in mean)
 "de.mean"
 
+
 #' indicator vector (1 for differential expression in multimodality)
 "de.mult"
 

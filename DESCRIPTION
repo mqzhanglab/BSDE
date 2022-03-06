@@ -1,16 +1,26 @@
 Package: BSDE
 Type: Package
 Title: Barycenter Single-Cell Differential Expression for Case-Control Studies
-Version: 0.1.0
-Author: Mengqi Zhang [aut, cre], Richard Guo
-Maintainer: Mengqi Zhang <meggy.q.zhang@gmail.com>
+Version: 0.10.0
+Authors@R: c(person(given = "Mengqi",
+             family = "Zhang",
+             role = c("aut", "cre"),
+             email = "meggy.q.zhang@gmail.com"),
+             person(given = "Richard",
+             family = "Guo",
+             role = c("aut"),
+             email = "rg681@cam.ac.uk"))
 Description: Single-cell RNAseq differential expression analysis for 
-    case-control studies using optimal transport.
+    case-control studies using optimal transport. This is a nonparametric method
+    for finding differentially expressed genes for case-control studies. 
+    Through the use of optimal transportation for aggregating distributions 
+    and computing their distances, our method overcomes the restrictive 
+    parametric assumptions imposed by standard mixed-effect-modeling approaches.
 License: MIT + file LICENSE
 URL: https://github.com/mqzhanglab/BSDE
 BugReports: https://github.com/mqzhanglab/BSDE/issues
 Depends:
-    R (>= 3.5.0)
+    R (>= 3.4.0)
 Imports: 
     scater,
     SingleCellExperiment,
@@ -25,6 +35,7 @@ Imports:
 Encoding: UTF-8
 RoxygenNote: 7.1.2
 Roxygen: list(markdown = TRUE)
-Suggests: knitr, rmarkdown
-VignetteBuilder: knitr
+Suggests: R.rsp
+VignetteBuilder: R.rsp
+biocViews: Genetics, DifferentialExpression, RNASeq, SingleCell
 LazyData: true

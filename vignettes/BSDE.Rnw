@@ -1,7 +1,0 @@
-\documentclass{article}
-\usepackage{pdfpages}
-% \VignetteIndexEntry{BSDE}
-\begin{document}
-\SweaveOpts{concordance=TRUE}
-\includepdf[pages=-, fitpaper=true]{BSDE-vig.pdf}
-\end{document}

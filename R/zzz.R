@@ -18,7 +18,7 @@
         reticulate::conda_install("r-reticulate", "POT")
         message("Environment `r-reticulate' is set up. Try `library(BSDE)' again.")
       }, error = function(.e) {
-        stop("Environment cannot be loaded.\nSee installation instructions: https://github.com/mqzhanglab/BSDE")
+        stop("Environment cannot be loaded. See https://github.com/mqzhanglab/BSDE for installation instructions.")
       })
     }
   })
